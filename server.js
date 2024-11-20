@@ -9,11 +9,11 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-const mongoURI = process.env.MONGO_URI || 'your-mongodb-atlas-url';
+const mongoURI = process.env.MONGO_URI || 'your-mongodb-atlas-url'; // Ensure this is set in Railway
 
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
-    .catch(err => console.log(err));
+    .catch(err => console.log('MongoDB connection error: ', err));
 
 const UserSchema = new mongoose.Schema({
     username: String,
@@ -28,13 +28,82 @@ app.use(bodyParser.json());
 
 app.post('/signup', async (req, res) => {
     const { username, password } = req.body;
-    const user = new User({ username, password, friends: [] });
-    await user.save();
-    res.send('User registered');
+    console.log('Received signup request:', username, password); // Debug log
+    try {
+        const user = new User({ username, password, friends: [] });
+        await user.save();
+        res.send('User registered');
+    } catch (err) {
+        console.error('Error during signup:', err); // Debug log
+        res.status(500).send('Signup failed');
+    }
 });
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    const user = await User.findOne({ username, password });
-    if (user) {
-        const token = jwt.sign({[_{{{CITATION{{{_1{](https://github.com/edsyang/blog/tree/2ce48a2788db8d4f4b5f5f5dc8c388799ea5c0c2/docs%2Fcourse%2Fvue%2F13-Vue.js-D.part%20four.md)[_{{{CITATION{{{_2{](https://github.com/rmamchyk/chat-bots/tree/ac4d59c2dd9333f365e3096cc56041cdbc7bd440/server.js)
+    console.log('Received login request:', username, password); // Debug log
+    try {
+        const user = await User.findOne({ username, password });
+        if (user) {
+            const token = jwt.sign({ userId: user._id }, 'your_jwt_secret');
+            res.json({ token });
+        } else {
+            res.status(401).send('Invalid credentials');
+        }
+    } catch (err) {
+        console.error('Error during login:', err); // Debug log
+        res.status(500).send('Login failed');
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log('User connected');
+
+    socket.on('add-user', async (username) => {
+        console.log('User added:', username);
+        try {
+            const user = await User.findOne({ username });
+            if (user) {
+                socket.join(user._id.toString());
+                socket.userId = user._id;
+                socket.username = username;
+            } else {
+                console.error('User not found:', username);
+            }
+        } catch (err) {
+            console.error('Error adding user:', err);
+        }
+    });
+
+    socket.on('message', (data) => {
+        io.emit('message', { username: data.username, message: data.message });
+    });
+
+    socket.on('add-friend', async (data) => {
+        const { username, friendUsername } = data;
+        try {
+            const user = await User.findOne({ username });
+            const friend = await User.findOne({ username: friendUsername });
+            if (user && friend) {
+                if (!user.friends.includes(friendUsername)) {
+                    user.friends.push(friendUsername);
+                    await user.save();
+                    socket.emit('update-friends-list', user.friends);
+                }
+            } else {
+                console.error('Friend not found:', friendUsername);
+            }
+        } catch (err) {
+            console.error('Error adding friend:', err);
+        }
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
