@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-const mongoURI = process.env.MONGO_URI;
+const mongoURI = process.env.MONGO_URI || 'mongodb://mongo:ZBHdYvcJhyAFhlnjcVhANwTjgODFhRLf@mongodb.railway.internal:27017';
 
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 
 app.post('/signup', async (req, res) => {
     const { username, password } = req.body;
-    console.log('Received signup request:', username);
+    console.log('Received signup request:', username); // Removed password log for security
     try {
         const existingUser = await User.findOne({ username });
         if (existingUser) {
@@ -38,14 +38,14 @@ app.post('/signup', async (req, res) => {
         await user.save();
         res.send('User registered');
     } catch (err) {
-        console.error('Error during signup:', err);
+        console.error('Error during signup:', err); // Debug log
         res.status(500).send('Signup failed');
     }
 });
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    console.log('Received login request:', username);
+    console.log('Received login request:', username); // Debug log
     try {
         const user = await User.findOne({ username, password });
         if (user) {
@@ -55,7 +55,7 @@ app.post('/login', async (req, res) => {
             res.status(401).send('Invalid credentials');
         }
     } catch (err) {
-        console.error('Error during login:', err);
+        console.error('Error during login:', err); // Debug log
         res.status(500).send('Login failed');
     }
 });
