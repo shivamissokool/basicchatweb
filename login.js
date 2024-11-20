@@ -3,7 +3,7 @@ document.getElementById('login-form').addEventListener('submit', function (e) {
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
 
-    fetch('/login', {
+    fetch('basicchatweb-production.up.railway.app', { // Update with your Railway backend URL
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -54,3 +54,4 @@ function setupChat(username) {
         });
     });
 }
+
