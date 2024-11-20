@@ -28,8 +28,12 @@ app.use(bodyParser.json());
 
 app.post('/signup', async (req, res) => {
     const { username, password } = req.body;
-    console.log('Received signup request:', username, password); // Debug log
+    console.log('Received signup request:', username); // Removed password log for security
     try {
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).send('Username already exists');
+        }
         const user = new User({ username, password, friends: [] });
         await user.save();
         res.send('User registered');
@@ -41,7 +45,7 @@ app.post('/signup', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    console.log('Received login request:', username, password); // Debug log
+    console.log('Received login request:', username); // Debug log
     try {
         const user = await User.findOne({ username, password });
         if (user) {
