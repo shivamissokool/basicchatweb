@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hogwarts Chat - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Welcome Back to Hogwarts Chat</h1>
+        <form id="login-form">
+            <input type="text" id="login-username" placeholder="Username" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+    </div>
+    <div class="chat-container" style="display:none;">
+        <aside class="sidebar">
+            <div class="friends-list">
+                <h2>Friends</h2>
+                <ul id="friends-list"></ul>
+                <input type="text" id="add-friend-input" placeholder="Add a friend by username" />
+                <button id="add-friend-button">Add Friend</button>
+            </div>
+        </aside>
+        <main class="chat-main">
+            <div id="chat-box"></div>
+            <input type="text" id="message-input" placeholder="Type a message..." />
+            <button id="send-button">Send</button>
+        </main>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="login.js"></script>
+</body>
+</html>
