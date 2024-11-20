@@ -3,7 +3,7 @@ document.getElementById('signup-form').addEventListener('submit', function (e) {
     const username = document.getElementById('signup-username').value;
     const password = document.getElementById('signup-password').value;
 
-    fetch('basicchatweb-production.up.railway.app', { // Update with your Railway backend URL
+    fetch('https://basicchatweb-production.up.railway.app/signup', { // Update with your Railway backend URL
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
